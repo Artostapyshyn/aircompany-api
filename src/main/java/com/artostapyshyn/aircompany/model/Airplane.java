@@ -7,6 +7,8 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -21,29 +23,35 @@ public class Airplane {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
+    @NotBlank
     private String name;
 
     @Column(name = "factory_serial_number", unique = true)
+    @NotBlank
     private String factorySerialNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "air_company_id")
     private AirCompany airCompany;
 
-    @Column(name = "number_of_flights")
+    @Column(name = "number_of_flights", nullable = false)
+    @Min(value = 0)
     private Integer numberOfFlights;
 
-    @Column(name = "flight_distance")
+    @Column(name = "flight_distance", nullable = false)
+    @Min(value = 0)
     private Double flightDistance;
 
-    @Column(name = "fuel_capacity")
+    @Column(name = "fuel_capacity", nullable = false)
+    @Min(value = 0)
     private Double fuelCapacity;
 
-    @Column(name = "type")
+    @Column(name = "type", nullable = false)
+    @NotBlank
     private String type;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
 

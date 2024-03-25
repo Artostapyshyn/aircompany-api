@@ -8,6 +8,8 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -24,7 +26,7 @@ public class Flight {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "flight_status")
+    @Column(name = "flight_status", nullable = false)
     private FlightStatus flightStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -35,16 +37,20 @@ public class Flight {
     @JoinColumn(name = "airplane_id")
     private Airplane airplane;
 
-    @Column(name = "departure_country")
+    @Column(name = "departure_country", nullable = false)
+    @NotBlank
     private String departureCountry;
 
-    @Column(name = "destination_country")
+    @Column(name = "destination_country", nullable = false)
+    @NotBlank
     private String destinationCountry;
 
-    @Column(name = "distance")
+    @Column(name = "distance", nullable = false)
+    @Min(value = 0)
     private Double distance;
 
-    @Column(name = "estimated_flight_time")
+    @Column(name = "estimated_flight_time", nullable = false)
+    @Min(value = 0)
     private Integer estimatedFlightTime;
 
     @Column(name = "started_at")
@@ -56,7 +62,7 @@ public class Flight {
     @Column(name = "delay_started_at")
     private LocalDateTime delayStartedAt;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
 
