@@ -1,18 +1,16 @@
 package com.artostapyshyn.aircompany.service;
 
+import com.artostapyshyn.aircompany.dto.FlightDto;
 import com.artostapyshyn.aircompany.enums.FlightStatus;
-import com.artostapyshyn.aircompany.model.Flight;
 
 import java.util.List;
 
 public interface FlightService {
-    List<Flight> findByAirCompanyNameAndFlightStatus(String companyName, FlightStatus flightStatus);
+    List<FlightDto> findByAirCompanyNameAndFlightStatus(String companyName, FlightStatus flightStatus);
 
-    List<Flight> findByFlightStatusAndStartedAtBefore();
+    FlightDto addFlight(FlightDto flightDto);
 
-    Flight addFlight(Flight flight);
+    FlightDto changeFlightStatus(Long flightId, FlightStatus newStatus);
 
-    Flight changeFlightStatus(Long flightId, FlightStatus newStatus);
-
-    List<Flight> findCompletedFlightsWithExceededEstimatedTime();
+    List<FlightDto> findCompletedFlightsWithExceededEstimatedTime();
 }

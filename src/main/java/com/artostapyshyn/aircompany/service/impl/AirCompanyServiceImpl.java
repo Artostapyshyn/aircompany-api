@@ -1,5 +1,6 @@
 package com.artostapyshyn.aircompany.service.impl;
 
+import com.artostapyshyn.aircompany.dto.AirCompanyDto;
 import com.artostapyshyn.aircompany.exception.ResourceNotFoundException;
 import com.artostapyshyn.aircompany.model.AirCompany;
 import com.artostapyshyn.aircompany.repository.AirCompanyRepository;
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -21,8 +23,10 @@ public class AirCompanyServiceImpl implements AirCompanyService {
 
     @Override
     @Transactional
-    public AirCompany save(AirCompany airCompany) {
-        return airCompanyRepository.save(airCompany);
+    public AirCompanyDto save(AirCompanyDto airCompanyDto) {
+        AirCompany airCompany = modelMapper.map(airCompanyDto, AirCompany.class);
+        AirCompany savedAirCompany = airCompanyRepository.save(airCompany);
+        return modelMapper.map(savedAirCompany, AirCompanyDto.class);
     }
 
     @Override
@@ -34,19 +38,22 @@ public class AirCompanyServiceImpl implements AirCompanyService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<AirCompany> findAll() {
-        return airCompanyRepository.findAll();
+    public List<AirCompanyDto> findAll() {
+        return airCompanyRepository.findAll().stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
-    public AirCompany update(AirCompany updateAirCompany) {
-        Long airCompanyId = updateAirCompany.getId();
+    public AirCompanyDto update(AirCompanyDto updateAirCompanyDto) {
+        AirCompany existingAirCompany = airCompanyRepository.findById(updateAirCompanyDto.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("AirCompany not found with id: " + updateAirCompanyDto.getId()));
 
-        AirCompany existingAirCompany = airCompanyRepository.findById(airCompanyId)
-                .orElseThrow(() -> new ResourceNotFoundException("AirCompany not found"));
-        modelMapper.map(updateAirCompany, existingAirCompany);
-        return airCompanyRepository.save(updateAirCompany);
+        modelMapper.getConfiguration().setSkipNullEnabled(true);
+        modelMapper.map(updateAirCompanyDto, existingAirCompany);
+        AirCompany updatedAirCompany = airCompanyRepository.save(existingAirCompany);
+        return modelMapper.map(updatedAirCompany, AirCompanyDto.class);
     }
 
     @Override
@@ -59,5 +66,9 @@ public class AirCompanyServiceImpl implements AirCompanyService {
         }
 
         airCompanyRepository.deleteById(id);
+    }
+
+    public AirCompanyDto mapToDto(AirCompany airCompany) {
+        return modelMapper.map(airCompany, AirCompanyDto.class);
     }
 }

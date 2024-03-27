@@ -7,7 +7,6 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,18 +25,16 @@ public class AirCompany {
     private Long id;
 
     @Column(name = "name", unique = true, nullable = false)
-    @NotBlank
     private String name;
 
     @Column(name = "company_type", nullable = false)
-    @NotBlank
     private String companyType;
 
     @Column(name = "founded_at", nullable = false)
     @CreationTimestamp
     private LocalDate foundedAt;
 
-    @OneToMany(mappedBy = "airCompany", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "airCompany", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Airplane> airplanes = new ArrayList<>();
 
     @Override

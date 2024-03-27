@@ -1,11 +1,13 @@
 package com.artostapyshyn.aircompany.service.impl;
 
+import com.artostapyshyn.aircompany.dto.FlightDto;
 import com.artostapyshyn.aircompany.enums.FlightStatus;
 import com.artostapyshyn.aircompany.exception.ResourceNotFoundException;
 import com.artostapyshyn.aircompany.model.Flight;
 import com.artostapyshyn.aircompany.repository.FlightRepository;
 import com.artostapyshyn.aircompany.service.FlightService;
 import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -18,26 +20,24 @@ import java.util.stream.Collectors;
 public class FlightServiceImpl implements FlightService {
 
     private final FlightRepository flightRepository;
+    private final ModelMapper modelMapper;
 
     @Override
-    public List<Flight> findByAirCompanyNameAndFlightStatus(String companyName, FlightStatus flightStatus) {
-        return flightRepository.findByAirCompanyNameAndFlightStatus(companyName, flightStatus);
+    public List<FlightDto> findByAirCompanyNameAndFlightStatus(String companyName, FlightStatus flightStatus) {
+        List<Flight> flights = flightRepository.findByAirCompanyNameAndFlightStatus(companyName, flightStatus);
+        return flights.stream().map(this::mapToDto).collect(Collectors.toList());
     }
 
     @Override
-    public List<Flight> findByFlightStatusAndStartedAtBefore() {
-        LocalDateTime twentyFourHoursAgo = LocalDateTime.now().minusHours(24);
-        return flightRepository.findByFlightStatusAndStartedAtBefore(FlightStatus.ACTIVE, twentyFourHoursAgo);
-    }
-
-    @Override
-    public Flight addFlight(Flight flight) {
+    public FlightDto addFlight(FlightDto flightDto) {
+        Flight flight = modelMapper.map(flightDto, Flight.class);
         flight.setFlightStatus(FlightStatus.PENDING);
-        return flightRepository.save(flight);
+        Flight savedFlight = flightRepository.save(flight);
+        return mapToDto(savedFlight);
     }
 
     @Override
-    public Flight changeFlightStatus(Long flightId, FlightStatus newStatus) {
+    public FlightDto changeFlightStatus(Long flightId, FlightStatus newStatus) {
         Flight flight = flightRepository.findById(flightId)
                 .orElseThrow(() -> new ResourceNotFoundException("Flight not found with id: " + flightId));
 
@@ -58,11 +58,12 @@ public class FlightServiceImpl implements FlightService {
         }
 
         flight.setFlightStatus(newStatus);
-        return flightRepository.save(flight);
+        Flight updatedFlight = flightRepository.save(flight);
+        return mapToDto(updatedFlight);
     }
 
     @Override
-    public List<Flight> findCompletedFlightsWithExceededEstimatedTime() {
+    public List<FlightDto> findCompletedFlightsWithExceededEstimatedTime() {
         List<Flight> completedFlights = flightRepository.findByFlightStatus(FlightStatus.COMPLETED);
 
         return completedFlights.stream()
@@ -70,6 +71,11 @@ public class FlightServiceImpl implements FlightService {
                     long durationInMinutes = Duration.between(flight.getStartedAt(), flight.getEndedAt()).toMinutes();
                     return durationInMinutes > flight.getEstimatedFlightTime();
                 })
+                .map(this::mapToDto)
                 .collect(Collectors.toList());
+    }
+
+    private FlightDto mapToDto(Flight flight) {
+        return modelMapper.map(flight, FlightDto.class);
     }
 }

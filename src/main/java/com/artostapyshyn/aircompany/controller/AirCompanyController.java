@@ -1,6 +1,6 @@
 package com.artostapyshyn.aircompany.controller;
 
-import com.artostapyshyn.aircompany.model.AirCompany;
+import com.artostapyshyn.aircompany.dto.AirCompanyDto;
 import com.artostapyshyn.aircompany.service.AirCompanyService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,26 +17,27 @@ public class AirCompanyController {
     private final AirCompanyService airCompanyService;
 
     @PostMapping
-    public ResponseEntity<AirCompany> createAirCompany(@RequestBody AirCompany airCompany) {
-        AirCompany savedAirCompany = airCompanyService.save(airCompany);
-        return new ResponseEntity<>(savedAirCompany, HttpStatus.CREATED);
+    public ResponseEntity<AirCompanyDto> createAirCompany(@RequestBody AirCompanyDto airCompanyDto) {
+        AirCompanyDto savedAirCompanyDto = airCompanyService.save(airCompanyDto);
+        return new ResponseEntity<>(savedAirCompanyDto, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<AirCompany>> getAllAirCompanies() {
-        List<AirCompany> airCompanies = airCompanyService.findAll();
+    public ResponseEntity<List<AirCompanyDto>> getAllAirCompanies() {
+        List<AirCompanyDto> airCompanies = airCompanyService.findAll();
         return ResponseEntity.ok(airCompanies);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AirCompany> getAirCompanyById(@PathVariable Long id) {
-        AirCompany airCompanyOptional = airCompanyService.findById(id);
-        return ResponseEntity.ok(airCompanyOptional);
+    public ResponseEntity<AirCompanyDto> getAirCompanyById(@PathVariable Long id) {
+        AirCompanyDto airCompanyDto = airCompanyService.mapToDto(airCompanyService.findById(id));
+        return ResponseEntity.ok(airCompanyDto);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<AirCompany> updateAirCompany(@PathVariable Long id, @RequestBody AirCompany airCompany) {
-        AirCompany updatedAirCompany = airCompanyService.update(airCompany);
+    public ResponseEntity<AirCompanyDto> updateAirCompany(@PathVariable Long id, @RequestBody AirCompanyDto airCompanyDto) {
+        airCompanyDto.setId(id);
+        AirCompanyDto updatedAirCompany = airCompanyService.update(airCompanyDto);
         return ResponseEntity.ok(updatedAirCompany);
     }
 

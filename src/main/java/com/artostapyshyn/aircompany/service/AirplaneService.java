@@ -1,12 +1,12 @@
 package com.artostapyshyn.aircompany.service;
 
-import com.artostapyshyn.aircompany.model.AirCompany;
-import com.artostapyshyn.aircompany.model.Airplane;
+import com.artostapyshyn.aircompany.dto.AirplaneDto;
 
 public interface AirplaneService {
-    void reassignAirplaneToCompany(AirCompany airCompany, Long airplaneId);
 
-    Airplane addAirplane(Airplane airplane);
+    void reassignAirplaneToCompany(Long airCompanyId, Long airplaneId);
 
-    Airplane assignAirplaneToCompany(Long airplaneId, Long companyId);
+    AirplaneDto addAirplane(AirplaneDto airplaneDto);
+
+    AirplaneDto assignAirplaneToCompany(Long airplaneId, Long companyId);
 }

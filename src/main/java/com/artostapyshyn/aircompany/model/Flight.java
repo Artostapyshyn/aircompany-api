@@ -33,7 +33,7 @@ public class Flight {
     @JoinColumn(name = "air_company_id")
     private AirCompany airCompany;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "airplane_id")
     private Airplane airplane;
 
